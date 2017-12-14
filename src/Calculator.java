@@ -23,7 +23,8 @@ public class Calculator {
 	/**
 	 * a subroutine that inplement gamma function.
 	 * 
-	 * @param input the input.
+	 * @param input
+	 *            the input.
 	 * @return result
 	 */
 	public static double Gamma(double input) {
@@ -36,6 +37,99 @@ public class Calculator {
 			}
 		}
 		return f;
+	}
+
+	public static double pow(double a, double b) {
+		boolean gt1 = (Math.sqrt((a - 1) * (a - 1)) <= 1) ? false : true;
+
+		int oc = -1; 
+		int iter = 20; 
+		double p, x, x2, sumX, sumY;
+
+		if ((b - Math.floor(b)) == 0) {
+			p = a;
+			for (int i = 1; i < b; i++)
+				p *= a;
+			return p;
+		}
+
+		x = (gt1) ? (a / (a - 1)) : 
+				(a - 1); 
+
+		sumX = (gt1) ? (1 / x) : 
+				x; 
+
+		for (int i = 2; i < iter; i++) {
+			p = x;
+			for (int j = 1; j < i; j++)
+				p *= x;
+
+			double xTemp = (gt1) ? (1 / (i * p)) :
+					(p / i);
+
+			sumX = (gt1) ? (sumX + xTemp) :
+					(sumX + (xTemp * oc)); // base is 1 or less
+
+			oc *= -1; // change math symbol (+,-)
+		}
+
+		x2 = b * sumX;
+
+		sumY = 1 + x2; // our estimate
+
+		for (int i = 2; i <= iter; i++) {
+			// find x2^iteration
+			p = x2;
+			for (int j = 1; j < i; j++)
+				p *= x2;
+
+			// multiply iterations (ex: 3 iterations = 3*2*1)
+			int yTemp = 2;
+			for (int j = i; j > 2; j--)
+				yTemp *= j;
+
+			// add to estimate (ex: 3rd iteration => (x2^3)/(3*2*1) )
+			sumY += p / yTemp;
+		}
+
+		return sumY; // return our estimate
+	}
+
+	public static double logarithm(double x) {
+		int integer_value = 0;
+		double base = Math.E;
+		int decimalplace = 10;
+
+		while (x < 1) {
+			integer_value--;
+			x = x * base;
+		}
+
+		while (x >= base) {
+			integer_value++;
+			x = x / base;
+		}
+		double decimal_fraction = 0.0;
+		double partial = 1.0;
+
+		x = pow(x, 10);
+
+		while (decimalplace > 0) {
+
+			partial = partial / 10;
+			int digit = 0;
+
+			while (x >= base) {
+				digit++;
+				x = x / base;
+			}
+			decimal_fraction = decimal_fraction + digit * partial;
+
+			x = pow(x, 10);
+			decimalplace--;
+		}
+		return integer_value + decimal_fraction;
+
 	}
 
 	public static double pSeries(double startNum, double p) {
@@ -182,14 +276,14 @@ public class Calculator {
 				 * Input must be in the form of "n1 ^ n2", prints n1 to the power of n2.
 				 */
 				case "^":
-					System.out.println("The result is " + (Math.pow(n1, n2)));
+					System.out.println("The result is " + (pow(n1, n2)));
 					break;
 
 				/**
 				 * Input must be in the form of "n1 log n2", prints logarithm to base n1 of n2.
 				 */
 				case "log":
-					System.out.println("The result is " + ((Math.log(n2)) / (Math.log(n1))));
+					System.out.println("The result is " + (logarithm(n2)) / (logarithm(n1)));
 					break;
 
 				/**
